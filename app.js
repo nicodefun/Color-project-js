@@ -87,12 +87,32 @@ const hslControl = (e) => {
   colorDivs[index].style.backgroundColor =  color;
 };
 
+const updateTextUI = (index) => {
+  const activeDiv = colorDivs[index];
+  const color = chroma(activeDiv.style.backgroundColor);
+  const divH2 = activeDiv.querySelector('h2');
+  divH2.innerText = color.hex();
+  checkColorContrast(color, divH2);
+  
+  const controlIcons = activeDiv.querySelectorAll('.controls button');
+  for (icon of controlIcons){
+    checkColorContrast(color, icon);
+  }
+  
+}
 
 
 //eventListeners
 sliders.forEach((slider) => {
   // data setup in HTML is important -- use getAttribute
   slider.addEventListener("input", hslControl);
+});
+
+colorDivs.forEach((div, index)=>{
+  //change can use for Div
+  div.addEventListener('change', ()=>{
+    updateTextUI(index);
+  });
 });
 
 
