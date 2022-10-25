@@ -12,14 +12,14 @@ const sliderContainers = document.querySelectorAll(".sliders");
 // important
 let initialColors;
 
-//functions 
-const generateColors = ()=>{
-   const hexColor = chroma.random();
-   return hexColor;
-}
+//functions
+const generateColors = () => {
+  const hexColor = chroma.random();
+  return hexColor;
+};
 
-const randomColorDivs = () =>{
-  colorDivs.forEach(div => {
+const randomColorDivs = () => {
+  colorDivs.forEach((div) => {
     const divTextTag = div.children[0];
     const randomColor = generateColors();
     // console.log(randomColor);
@@ -29,37 +29,71 @@ const randomColorDivs = () =>{
 
     //initial colorize slider
     const color = chroma(randomColor);
-    const sliders = div.querySelectorAll('.sliders input');
+    const sliders = div.querySelectorAll(".sliders input");
     // console.log(sliders);
     const sliderHue = sliders[0];
     const sliderBright = sliders[1];
     const sliderSat = sliders[2];
     colorizeSliders(color, sliderHue, sliderBright, sliderSat);
-  })
-} 
+  });
+};
 
 const checkColorContrast = (color, text) => {
   const luminance = chroma(color).luminance();
-  if (luminance >0.5){
-    text.style.color = 'black';
-  }else{
-    text.style.color = 'white';
+  if (luminance > 0.5) {
+    text.style.color = "black";
+  } else {
+    text.style.color = "white";
   }
-}
-const colorizeSliders = (color, sliderHue, sliderBright, sliderSat) =>{
+};
+const colorizeSliders = (color, sliderHue, sliderBright, sliderSat) => {
   //goal get color min/max for each properties
   //scale sat
-  const noSat = color.set('hsl.s', 0);
-  const fullSat = color.set('hsl.s', 1);
+  const noSat = color.set("hsl.s", 0);
+  const fullSat = color.set("hsl.s", 1);
   const scaleSat = chroma.scale([noSat, color, fullSat]);
   //scale brightness
-  const midBright = color.set('hsl.l', 0.5);
-  const scaleBright = chroma.scale(['black', midBright, 'white']);
+  const midBright = color.set("hsl.l", 0.5);
+  const scaleBright = chroma.scale(["black", midBright, "white"]);
 
   //input update --- important
-  sliderSat.style.backgroundImage = `linear-gradient(to right, ${scaleSat(0)}, ${scaleSat(1)})`;
-  sliderBright.style.backgroundImage = `linear-gradient(to right,  ${scaleBright(0)}, ${scaleBright(0.5)}, ${scaleBright(1)})`;
-  sliderHue.style.backgroundImage = `linear-gradient(to right, rgb(204, 75, 75), rgb(204,204 ,75),rgb(75, 204, 75),rgb(75, 204, 204),rgb(75,75,204),rgb(204,75,204),rgb(204,75,75))`
-}
+  sliderSat.style.backgroundImage = `linear-gradient(to right, ${scaleSat(
+    0
+  )}, ${scaleSat(1)})`;
+  sliderBright.style.backgroundImage = `linear-gradient(to right,  ${scaleBright(
+    0
+  )}, ${scaleBright(0.5)}, ${scaleBright(1)})`;
+  sliderHue.style.backgroundImage = `linear-gradient(to right, rgb(204, 75, 75), rgb(204,204 ,75),rgb(75, 204, 75),rgb(75, 204, 204),rgb(75,75,204),rgb(204,75,204),rgb(204,75,75))`;
+};
+
+const hslControl = (e) => {
+  const index =
+    e.target.getAttribute("data-hue") ||
+    e.target.getAttribute("data-bright") ||
+    e.target.getAttribute("data-sat");
+  // console.log(index);
+  let currentSliders = e.target.parentElement.querySelectorAll("input[type='range']");
+  
+  const hueInput = currentSliders[0];
+  const brightInput = currentSliders[1];
+  const satInput = currentSliders[2];
+
+  const bgDivColor = colorDivs[index].querySelector('h2').innerText;
+  let color = chroma(bgDivColor)
+  .set('hsl.s', satInput.value)
+  .set('hsl.h', hueInput.value)
+  .set('hsl.l', brightInput.value);
+
+  colorDivs[index].style.backgroundColor =  color;
+};
+
+
+
+//eventListeners
+sliders.forEach((slider) => {
+  // data setup in HTML is important -- use getAttribute
+  slider.addEventListener("input", hslControl);
+});
+
 
 randomColorDivs();
