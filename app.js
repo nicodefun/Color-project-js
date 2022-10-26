@@ -127,6 +127,9 @@ const hslControl = (e) => {
   .set('hsl.l', brightInput.value);
 
   colorDivs[index].style.backgroundColor =  color;
+
+  colorizeSliders(color, hueInput, brightInput, satInput);
+
 };
 
 const checkContrastIcons = (activeDiv, color) =>{
@@ -157,6 +160,7 @@ colorDivs.forEach((div, index)=>{
     updateTextUI(index);
   });
 });
+
 
 
 randomColorDivs();
