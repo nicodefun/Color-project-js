@@ -19,6 +19,31 @@ const generateColors = () => {
   return hexColor;
 };
 
+const sliderChoice = (data, slider, index) =>{
+  const color = initialColors[slider.getAttribute(data)];
+  return (chroma(color).hsl()[index]);
+  
+}
+
+const resetInputs = ()=>{
+  sliders.forEach(slider =>{
+    switch(slider.name){
+      case 'hue':  
+        const hueValue = sliderChoice('data-hue', slider, 0);
+        slider.value = Math.floor(hueValue);
+      break;
+      case 'brightness':
+        const brightValue = sliderChoice('data-bright', slider, 2);
+        slider.value = brightValue.toFixed(2);
+      break;
+      case 'saturation':
+        const satValue = sliderChoice('data-sat', slider, 1);
+        slider.value = satValue.toFixed(2);
+      break;
+    }
+  })
+};
+
 const randomColorDivs = () => {
   //important
   initialColors = [];
@@ -45,8 +70,9 @@ const randomColorDivs = () => {
     colorizeSliders(color, sliderHue, sliderBright, sliderSat);
     
     checkContrastIcons(div, color);
-
   });
+
+  resetInputs();
 };
 
 const checkColorContrast = (color, text) => {
@@ -118,7 +144,6 @@ const updateTextUI = (index) => {
   checkContrastIcons(activeDiv, color);
 
 };
-
 
 //eventListeners
 sliders.forEach((slider) => {
