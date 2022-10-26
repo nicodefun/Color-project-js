@@ -6,7 +6,7 @@ const sliders = document.querySelectorAll('input[type="range"]');
 const currentHexes = document.querySelectorAll(".color h2");
 const popup = document.querySelector(".copy-container");
 const adjustButtons = document.querySelectorAll(".adjust");
-const lockButton = document.querySelectorAll(".lock");
+const lockButtons = document.querySelectorAll(".lock");
 const closeAdjustments = document.querySelectorAll(".close-adjustment");
 const sliderContainers = document.querySelectorAll(".sliders");
 // important
@@ -52,10 +52,21 @@ const randomColorDivs = () => {
     const divTextTag = div.children[0];
     const randomColor = generateColors();
     // console.log(chroma(randomColor).hex());
+    
+    // console.log(divTextTag.innerText);---> get the last array
+    if(div.classList.contains('locked')){
+      initialColors.push(divTextTag.innerText);
+      return; ///important
+    }else{
+      initialColors.push(chroma(randomColor).hex());
+    }
+    
     divTextTag.innerText = randomColor;
-
+    // console.log(divTextTag.innerText); 
     // push to initial colors
-    initialColors.push(chroma(randomColor).hex());
+    // if(div.classList.contains('locked')){
+    //   initialColors.push
+    // }
     
     div.style.backgroundColor = randomColor;
     checkColorContrast(randomColor, divTextTag);
@@ -191,5 +202,18 @@ closeAdjustments.forEach((btn,index) =>{
   });
 });
 
+lockButtons.forEach((btn, index)=>{
+  btn.addEventListener('click', ()=>{
+    const div = colorDivs[index];
+    div.classList.toggle('locked');
+    if(div.classList.contains('locked')){
+      btn.children[0].classList = 'fas fa-lock';
+    }else{
+      btn.children[0].classList = 'fas fa-lock-open';
+    }
+  })
+})
+
+generateBtn.addEventListener('click', randomColorDivs);
 
 randomColorDivs();
