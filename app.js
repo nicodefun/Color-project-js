@@ -5,7 +5,7 @@ const generateBtn = document.querySelector(".generate");
 const sliders = document.querySelectorAll('input[type="range"]');
 const currentHexes = document.querySelectorAll(".color h2");
 const popup = document.querySelector(".copy-container");
-const adjustButton = document.querySelectorAll(".adjust");
+const adjustButtons = document.querySelectorAll(".adjust");
 const lockButton = document.querySelectorAll(".lock");
 const closeAdjustments = document.querySelectorAll(".close-adjustment");
 const sliderContainers = document.querySelectorAll(".sliders");
@@ -154,6 +154,8 @@ const copyToClipBoard = (hex)=>{
   popupBox.classList.add('active');
 }
 
+
+
 //eventListeners ---------------------
 sliders.forEach((slider) => {
   // data setup in HTML is important -- use getAttribute
@@ -175,6 +177,18 @@ currentHexes.forEach(hex =>{
 popup.addEventListener('transitionend', ()=>{
   popupBox.classList.remove('active');
   popup.classList.remove('active');
+});
+
+adjustButtons.forEach((btn,index) =>{
+  btn.addEventListener('click', ()=>{
+    sliderContainers[index].classList.toggle('active');
+  });
+});
+
+closeAdjustments.forEach((btn,index) =>{
+  btn.addEventListener('click', ()=>{
+    sliderContainers[index].classList.remove('active');
+  });
 });
 
 
