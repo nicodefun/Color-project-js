@@ -12,6 +12,7 @@ const sliderContainers = document.querySelectorAll(".sliders");
 // important
 let initialColors;
 
+
 //functions
 const generateColors = () => {
   const hexColor = chroma.random();
@@ -19,14 +20,21 @@ const generateColors = () => {
 };
 
 const randomColorDivs = () => {
+  //important
+  initialColors = [];
+
   colorDivs.forEach((div) => {
     const divTextTag = div.children[0];
     const randomColor = generateColors();
-    // console.log(randomColor);
+    // console.log(chroma(randomColor).hex());
     divTextTag.innerText = randomColor;
+
+    // push to initial colors
+    initialColors.push(chroma(randomColor).hex());
+    
     div.style.backgroundColor = randomColor;
     checkColorContrast(randomColor, divTextTag);
-
+  
     //initial colorize slider
     const color = chroma(randomColor);
     const sliders = div.querySelectorAll(".sliders input");
@@ -35,6 +43,9 @@ const randomColorDivs = () => {
     const sliderBright = sliders[1];
     const sliderSat = sliders[2];
     colorizeSliders(color, sliderHue, sliderBright, sliderSat);
+    
+    checkContrastIcons(div, color);
+
   });
 };
 
@@ -46,6 +57,7 @@ const checkColorContrast = (color, text) => {
     text.style.color = "white";
   }
 };
+
 const colorizeSliders = (color, sliderHue, sliderBright, sliderSat) => {
   //goal get color min/max for each properties
   //scale sat
@@ -67,18 +79,22 @@ const colorizeSliders = (color, sliderHue, sliderBright, sliderSat) => {
 };
 
 const hslControl = (e) => {
-  const index =
-    e.target.getAttribute("data-hue") ||
-    e.target.getAttribute("data-bright") ||
-    e.target.getAttribute("data-sat");
-  // console.log(index);
+  
   let currentSliders = e.target.parentElement.querySelectorAll("input[type='range']");
   
   const hueInput = currentSliders[0];
   const brightInput = currentSliders[1];
   const satInput = currentSliders[2];
+  //important ---- should not do this!!!
+  // const bgDivColor = colorDivs[index].querySelector('h2').innerText;
+  const index =
+    e.target.getAttribute("data-hue") ||
+    e.target.getAttribute("data-bright") ||
+    e.target.getAttribute("data-sat");
+  // console.log(index);
+  const bgDivColor = initialColors[index];
+  // console.log(`bgColor: ${bgDivColor}`);
 
-  const bgDivColor = colorDivs[index].querySelector('h2').innerText;
   let color = chroma(bgDivColor)
   .set('hsl.s', satInput.value)
   .set('hsl.h', hueInput.value)
@@ -87,19 +103,21 @@ const hslControl = (e) => {
   colorDivs[index].style.backgroundColor =  color;
 };
 
+const checkContrastIcons = (activeDiv, color) =>{
+  const controlIcons = activeDiv.querySelectorAll('.controls button');
+  for (icon of controlIcons){
+    checkColorContrast(color, icon);
+}};
+
 const updateTextUI = (index) => {
   const activeDiv = colorDivs[index];
   const color = chroma(activeDiv.style.backgroundColor);
   const divH2 = activeDiv.querySelector('h2');
   divH2.innerText = color.hex();
   checkColorContrast(color, divH2);
-  
-  const controlIcons = activeDiv.querySelectorAll('.controls button');
-  for (icon of controlIcons){
-    checkColorContrast(color, icon);
-  }
-  
-}
+  checkContrastIcons(activeDiv, color);
+
+};
 
 
 //eventListeners
