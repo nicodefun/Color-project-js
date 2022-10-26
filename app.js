@@ -11,9 +11,9 @@ const closeAdjustments = document.querySelectorAll(".close-adjustment");
 const sliderContainers = document.querySelectorAll(".sliders");
 // important
 let initialColors;
+const popupBox = popup.children[0];
 
-
-//functions
+//functions ---------------------
 const generateColors = () => {
   const hexColor = chroma.random();
   return hexColor;
@@ -111,7 +111,7 @@ const hslControl = (e) => {
   const hueInput = currentSliders[0];
   const brightInput = currentSliders[1];
   const satInput = currentSliders[2];
-  //important ---- should not do this!!!
+  //important --- should not do this!!!
   // const bgDivColor = colorDivs[index].querySelector('h2').innerText;
   const index =
     e.target.getAttribute("data-hue") ||
@@ -147,8 +147,14 @@ const updateTextUI = (index) => {
   checkContrastIcons(activeDiv, color);
 
 };
+const copyToClipBoard = (hex)=>{
+  //clipboard function
+  navigator.clipboard.writeText(hex.innerText);
+  popup.classList.add('active');
+  popupBox.classList.add('active');
+}
 
-//eventListeners
+//eventListeners ---------------------
 sliders.forEach((slider) => {
   // data setup in HTML is important -- use getAttribute
   slider.addEventListener("input", hslControl);
@@ -160,7 +166,16 @@ colorDivs.forEach((div, index)=>{
     updateTextUI(index);
   });
 });
+currentHexes.forEach(hex =>{
+  hex.addEventListener('click', ()=>{
+    copyToClipBoard(hex);
+  })
+});
 
+popup.addEventListener('transitionend', ()=>{
+  popupBox.classList.remove('active');
+  popup.classList.remove('active');
+});
 
 
 randomColorDivs();
