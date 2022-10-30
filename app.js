@@ -12,6 +12,7 @@ const sliderContainers = document.querySelectorAll(".sliders");
 // important
 let initialColors;
 const popupBox = popup.children[0];
+let savedPallettes = [];
 
 //functions ---------------------
 const generateColors = () => {
@@ -212,8 +213,127 @@ lockButtons.forEach((btn, index)=>{
       btn.children[0].classList = 'fas fa-lock-open';
     }
   })
-})
+});
 
 generateBtn.addEventListener('click', randomColorDivs);
+
+
+//implement save to pallettes and LOCAL STORAGE stuff
+const saveBtn = document.querySelector('.save');
+const submitSave = document.querySelector('.submit-save');
+const closeSave = document.querySelector('.close-save');
+const savePopup = document.querySelector('.save-popup');
+const saveContainer = document.querySelector('.save-container');
+const saveInput = document.querySelector('.save-name');
+//library
+const libraryContainer = document.querySelector(".library-container");
+const libraryBtn = document.querySelector(".library");
+const closeLibraryBtn = document.querySelector(".close-library");
+
+
+const openPallette = ()=>{
+  savePopup.classList.add('active');
+  saveContainer.classList.add('active');
+};
+const closePallette =()=>{
+  savePopup.classList.remove('active');
+  saveContainer.classList.remove('active');
+};
+
+const saveToLocal = (obj)=>{
+  let localPallettes;
+  if (localStorage.getItem('pallettes') === null){
+    localPallettes = [];
+  } else{
+    localPallettes = JSON.parse(localStorage.getItem('pallettes'));
+  }
+  localPallettes.push(obj);
+  localStorage.setItem('pallettes', JSON.stringify(localPallettes));
+};
+
+const libraryDiv = (paletteObj)=>{
+  const palette = document.createElement("div");
+  palette.classList.add("custom-palette");
+  const title = document.createElement("h4");
+  title.innerText = paletteObj.name;
+  const preview = document.createElement("div");
+  preview.classList.add("small-preview");
+  paletteObj.color.forEach(smallColor => {
+    const smallDiv = document.createElement("div");
+    smallDiv.style.backgroundColor = smallColor;
+    preview.appendChild(smallDiv);
+  });
+  const paletteBtn = document.createElement("button");
+  paletteBtn.classList.add("pick-palette-btn");
+  paletteBtn.classList.add(paletteObj.nr);
+  paletteBtn.innerText = "Select";
+
+  //Attach event to the btn
+  paletteBtn.addEventListener("click", e => {
+    closeLibrary();
+    const paletteIndex = e.target.classList[1];
+    initialColors = [];
+    savedPallettes[paletteIndex].color.forEach((color, index) => {
+      initialColors.push(color);
+      colorDivs[index].style.backgroundColor = color;
+      const text = colorDivs[index].children[0];
+      checkColorContrast(color, text);
+      updateTextUI(index);
+    });
+    resetInputs();
+  });
+
+  //Append to Library
+  palette.appendChild(title);
+  palette.appendChild(preview);
+  palette.appendChild(paletteBtn);
+  libraryContainer.children[0].appendChild(palette);
+};
+
+const savePallette = (e) =>{
+  e.preventDefault();
+  closePallette();
+  const colors = [];
+  currentHexes.forEach(hex =>{
+    colors.push(hex.innerText);
+  });
+
+  const savedName = saveInput.value;
+  let savedNumber = savedPallettes.length;
+  const palletteObj = {
+    name: savedName,
+    color: colors,
+    nr: savedNumber
+  };
+  savedPallettes.push(palletteObj);
+  saveInput.value='';
+  //save to local storage
+  saveToLocal(palletteObj);
+
+  //generate the pallette for library
+  libraryDiv(palletteObj);
+
+};
+
+const closeLibrary = ()=>{
+  const popup = saveContainer.children[0];
+  libraryContainer.classList.remove("active");
+  popup.classList.remove("active");
+};
+
+
+
+saveBtn.addEventListener('click', openPallette);
+closeSave.addEventListener('click', closePallette);
+submitSave.addEventListener('click', (e) => {
+  savePallette(e);
+});
+libraryBtn.addEventListener("click", ()=>{
+  const popup = saveContainer.children[0];
+  libraryContainer.classList.add("active");
+  popup.classList.add("active");
+});
+closeLibraryBtn.addEventListener("click", closeLibrary);
+
 
 randomColorDivs();
